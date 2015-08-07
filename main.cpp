@@ -12,32 +12,7 @@ using Json::Writer;
 using std::ifstream;
 using std::cout;
 
-namespace icfp2015 {
-
-    // field
-    class Field {
-
-    public:
-        Field(Json::Value &value);
-    };
-
-    // tetris solver
-    class Solver {
-        enum class actions {
-            MoveE, MoveR, MoveSE, MoveSR, TurnCW, TurnCCW
-        };
-    public:
-        Solver(Json::Value &value, Field &field, Units &units);
-    };
-
-    Solver::Solver(Json::Value &value, Field &field, Units &units) {
-
-    }
-
-    Field::Field(Json::Value &value) {
-
-    }
-}
+using namespace icfp2015;
 
 int main(int argc, char **argv) {
     vector<string> ofPower;
@@ -73,9 +48,9 @@ int main(int argc, char **argv) {
         x.parse(file, root, false);
     }
 
-    icfp2015::Field f(root);
+    Field f(root);
     Units u(root);
-    icfp2015::Solver c(root, f, u);
+    Solver c(root, f, u);
     Finder k(c, ofPower);
 
     k.PrintSolutions();

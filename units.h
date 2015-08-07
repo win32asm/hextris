@@ -5,24 +5,22 @@
 #ifndef ICFP2015_UNITS_H
 #define ICFP2015_UNITS_H
 
-#include <json/value.h>
+#include <json/json.h>
 
+namespace icfp2015 {
 // one figure
-class Unit {
+    class Unit {
 
-};
+    };
 
 // set of figures
-class Units {
+    class Units {
 
-public:
-    Units(Json::Value &value);
-};
-
-Units::Units(Json::Value &value) {
+    public:
+        Units(Json::Value &value);
+    };
 
 }
 
-#include <json/json.h>
 
 #endif //ICFP2015_UNITS_H

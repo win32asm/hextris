@@ -5,23 +5,24 @@
 #ifndef ICFP2015_FINDER_H
 #define ICFP2015_FINDER_H
 
+#include <string>
+#include <vector>
+#include "Solver.h"
+
+namespace icfp2015 {
+    using std::vector;
+    using std::string;
+
 // power word finder
-class Finder {
+    class Finder {
 
-public:
-    Finder(Solver &solver, vector<::std::basic_string> &vector);
+    public:
+        Finder(Solver &solver, vector<string> &vector);
 
-    void PrintSolutions();
-};
+        void PrintSolutions();
+    };
 
-void Finder::PrintSolutions() {
-
-}
-
-Finder::Finder(Solver & solver, vector < ::std::basic_string > &vector) {
+//#include "main.cpp"
 
 }
-
-#include "main.cpp"
-
 #endif //ICFP2015_FINDER_H
