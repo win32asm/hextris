@@ -17,9 +17,9 @@ namespace icfp2015 {
     class Finder {
 
     public:
-        Finder(Solver &solver, vector<string> &vector);
+        Finder(Solution &solver, RNG &gen, Field &fld, Units &units, vector<string> ofPower) { };
 
-        void PrintSolutions();
+        void PrintSolution(long i, long i1);
     };
 
 //#include "main.cpp"

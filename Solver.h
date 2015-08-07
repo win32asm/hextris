@@ -6,19 +6,37 @@
 #define ICFP2015_SOLVER_H
 
 #include <json/json.h>
+#include <vector>
 #include "units.h"
 #include "Field.h"
+#include "RNGSeed.h"
 
 namespace icfp2015 {
 
+    using std::vector;
+
+    enum class Actions {
+        MoveE, MoveR, MoveSE, MoveSR, TurnCW, TurnCCW
+    };
+
+    class Solution {
+    public:
+        vector<Actions> code;
+    };
+
 // tetris solver
     class Solver {
-        enum class actions {
-            MoveE, MoveR, MoveSE, MoveSR, TurnCW, TurnCCW
-        };
+
     public:
-        Solver(Json::Value &value, Field &field, Units &units);
+        Solver(icfp2015::RNG &value, Field &field, Units &units);
+
+        Solution operator()() {
+            Solution s;
+            return s;
+        }
     };
+
+
 }
 
 #endif //ICFP2015_SOLVER_H

@@ -2,7 +2,6 @@
 #include <json/json.h>
 #include <getopt.h>
 #include <fstream>
-#include "units.h"
 #include "Finder.h"
 
 using std::string;
@@ -11,6 +10,7 @@ using Json::Reader;
 using Json::Writer;
 using std::ifstream;
 using std::cout;
+using std::endl;
 
 using namespace icfp2015;
 
@@ -23,7 +23,7 @@ int main(int argc, char **argv) {
     Json::Reader x;
     Json::Value root;
 
-    while ((opt = getopt(argc, argv, "f:t:m:p:"))) {
+    while ((opt = getopt(argc, argv, "f:t:m:p:")) >= 0) {
         switch (opt) {
             case 'f':
                 fName = optarg;
@@ -38,7 +38,11 @@ int main(int argc, char **argv) {
                 ofPower.push_back(optarg);
                 break;
             default:
-                printf("unidentified arg '%c'\n", (char) opt);
+                if (opt > 0) {
+                    printf("unidentified arg '%c'\n", (char) opt);
+                } else {
+                    printf("no args?\n");
+                }
                 return 1;
         }
     }
@@ -48,12 +52,27 @@ int main(int argc, char **argv) {
         x.parse(file, root, false);
     }
 
-    Field f(root);
-    Units u(root);
-    Solver c(root, f, u);
-    Finder k(c, ofPower);
 
-    k.PrintSolutions();
+    Field f(root);
+
+    f.print();
 
     return 0;
+#if 0
+    Units u(root);
+    RNGSeeds s(root);
+    long id = root["id"].asInt64();
+    for (RNG &gen : s.list) {
+        long seed = gen.seed();
+
+        f.reset();
+        Solver c(gen, f, u);
+
+        Finder k(c, f, u, ofPower);
+
+        k.PrintSolution(id, seed);
+    }
+
+    return 0;
+#endif
 }

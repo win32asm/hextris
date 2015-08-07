@@ -5,11 +5,8 @@
 
 namespace icfp2015 {
 
-    void Finder::PrintSolutions() {
+    void Finder::PrintSolution(long ig, long seed) {
 
     }
 
-    Finder::Finder(Solver &solver, vector<string> &ofPower) {
-
-    }
 }

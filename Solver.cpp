@@ -6,7 +6,7 @@
 
 namespace icfp2015 {
 
-    Solver::Solver(Json::Value &value, Field &field, Units &units) {
+    Solver::Solver(icfp2015::RNG &value, Field &field, Units &units) {
 
     }
 }
