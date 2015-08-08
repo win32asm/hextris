@@ -6,7 +6,11 @@
 
 namespace icfp2015 {
 
-    Units::Units(Json::Value &value) {
-
+    Units::Units(const Json::Value &root) {
+        const Json::Value &ulist = root["units"];
+        for (const Json::Value &udata:ulist) {
+            Unit nUnit(udata);
+            list.push_back(nUnit);
+        }
     }
 }

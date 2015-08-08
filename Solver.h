@@ -22,6 +22,8 @@ namespace icfp2015 {
     class Solution {
     public:
         vector<Actions> code;
+
+        void reset() { code.clear(); }
     };
 
 // tetris solver
@@ -30,7 +32,7 @@ namespace icfp2015 {
     public:
         Solver(icfp2015::RNG &value, Field &field, Units &units);
 
-        Solution operator()() {
+        Solution getSol() {
             Solution s;
             return s;
         }

@@ -55,24 +55,41 @@ int main(int argc, char **argv) {
 
     Field f(root);
 
-    f.print();
-
-    return 0;
-#if 0
+    //f.print();
     Units u(root);
     RNGSeeds s(root);
     long id = root["id"].asInt64();
+
+    printf("task id %li\n", id);
+
+    for (auto &rng:s.list) {
+        printf("Using RNG with seed %li\n", rng.seed());
+    }
+
+    return 0;
+
+    for (int i = 0; i < u.num(); ++i) {
+        Unit ux = u[i];
+        printf("-----------------unit %i\n", i);
+        for (int j = 0; j <= 6; ++j) {
+            ux.print();
+            ux.rotate(true);
+        }
+    }
+
+    return 0;
+
     for (RNG &gen : s.list) {
         long seed = gen.seed();
 
         f.reset();
         Solver c(gen, f, u);
+        Solution x = c.getSol();
 
-        Finder k(c, f, u, ofPower);
+        Finder k(x, gen, f, u, ofPower);
 
         k.PrintSolution(id, seed);
     }
 
     return 0;
-#endif
 }

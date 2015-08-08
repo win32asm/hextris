@@ -37,7 +37,11 @@ namespace icfp2015 {
     public:
         vector<RNG> list;
 
-        RNGSeeds(Json::Value &root) { };
+        RNGSeeds(const Json::Value &root) {
+            for (const Json::Value &nsd:root["sourceSeeds"]) {
+                list.push_back(RNG(nsd.asInt()));
+            }
+        };
     };
 }
 

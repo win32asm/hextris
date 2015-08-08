@@ -10,9 +10,10 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 find_library(libjsoncpp-dev jsoncpp)
 
-set(SOURCE_FILES main.cpp Field.cpp Finder.cpp Solver.cpp units.cpp RNGSeed.cpp
-Finder.h Field.h Solver.h units.h RNGSeed.h
+set(SOURCE_FILES main.cpp Field.cpp Finder.cpp Solver.cpp units.cpp RNGSeed.cpp Simulate.cpp
+Finder.h Field.h Solver.h units.h RNGSeed.h Simulate.h
 
+#json library
 /usr/include/jsoncpp/json/autolink.h
 /usr/include/jsoncpp/json/config.h
 /usr/include/jsoncpp/json/features.h
@@ -23,5 +24,5 @@ Finder.h Field.h Solver.h units.h RNGSeed.h
 /usr/include/jsoncpp/json/writer.h
 
 )
-add_executable(icfp2015 ${SOURCE_FILES} RNGSeed.cpp RNGSeed.h Simulate.cpp Simulate.h)
+add_executable(icfp2015 ${SOURCE_FILES})
 target_link_libraries(icfp2015 jsoncpp)

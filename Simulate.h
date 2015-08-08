@@ -12,16 +12,22 @@
 namespace icfp2015 {
 
     class Simulate {
-        Field field;
-        Units units;
-    public:
-        Simulate(Field &f, Units &u) : field(f), units(u) { };
+        Field &field; // shared field
+        const Units &units; // shared const
+        RNG gen;
 
-        bool nextUnit(long index); // returns true if figure can be placed
+        Solution last;
+        Unit curUnit;
+    public:
+        Simulate(Field &f, const Units &u, RNG &g) : field(f), units(u), gen(g) { };
+
+        bool nextUnit(); // returns true if figure can be placed
         bool step(Actions a); // returns true if action didn`t lock
         long score();
 
-        long run(Solution &sol, RNG &gen); // returns score, field not reset after.
+        long run(Solution &sol); // returns score, field not reset after.
+
+        Solution getLast() { return last; }
     };
 }
 
