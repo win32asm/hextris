@@ -23,7 +23,7 @@ int main(int argc, char **argv) {
     string fName;
     Json::Reader x;
     Json::Value root;
-    bool printField = false, printUnits = false, showSol = false;
+    bool printField = false, printUnits = false, showScore = false;
 
     while ((opt = getopt(argc, argv, "f:t:m:p:FUS")) >= 0) {
         switch (opt) {
@@ -34,7 +34,7 @@ int main(int argc, char **argv) {
                 printUnits = true;
                 break;
             case 'S':
-                showSol = true;
+                showScore = true;
                 break;
             case 'f':
                 fName = optarg;
@@ -115,6 +115,10 @@ int main(int argc, char **argv) {
             }
             //sim.step(Actions::MoveW);
             printf("-------------- Step %i complete\n", i);
+        }
+
+        if (showScore) {
+            printf("solution score: %li\n", sim.score());
         }
         //Solver c(sim, f);
         //Solution sol = c.getSol();

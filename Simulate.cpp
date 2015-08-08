@@ -53,14 +53,14 @@ bool icfp2015::Simulate::step(icfp2015::Actions a, bool verify) {
     } else {
         if (!verify) {
             curUnit.Lock(field, uX, uY); // lock
-            field.simplify();
+            int sz = curUnit.size();
+            int lines = field.simplify();
+            int pts = sz + 50 * lines * (lines + 1);
+            curScore += pts + (lastLines - 1) * pts / 10;
+            lastLines = lines;
         }
         return false;
     }
-}
-
-long icfp2015::Simulate::score() {
-    return 0;
 }
 
 long icfp2015::Simulate::run(icfp2015::Solution &sol) {
@@ -68,6 +68,8 @@ long icfp2015::Simulate::run(icfp2015::Solution &sol) {
     field.reset();
     gen.reset();
     last.reset();
+    curScore = 0;
+    lastLines = 0;
 
     for (Actions a : sol.code) {
         if (needFigure && !nextUnit()) {

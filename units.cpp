@@ -17,4 +17,8 @@ namespace icfp2015 {
     int Unit::width() {
         return xbx - xbm + 1;
     }
+
+    int Unit::size() {
+        return (int) xList.size();
+    }
 }

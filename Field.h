@@ -51,13 +51,15 @@ namespace icfp2015 {
             return curfield[wid * y + x];
         }
 
-        void simplify() {
+        int simplify() {
+            int removedLines = 0;
             for (int i = 0; i < hei; ++i) {
                 bool allSet = true;
                 for (int j = 0; j < wid; ++j) {
                     allSet &= curfield[i * wid + j] == '*';
                 }
                 if (allSet) {
+                    ++removedLines;
                     if (i != 0) {
                         memmove(&curfield[wid], &curfield[0], i * wid);
                     } else {
@@ -65,6 +67,7 @@ namespace icfp2015 {
                     }
                 }
             }
+            return removedLines;
         }
 
         const void print() {

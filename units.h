@@ -189,6 +189,8 @@ namespace icfp2015 {
         }
 
         int width();
+
+        int size();
     };
 
 // set of figures
