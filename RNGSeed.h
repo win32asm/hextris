@@ -20,7 +20,7 @@ namespace icfp2015 {
     public:
         RNG(long seed) : _rngVal(seed), _seed(seed) { };
 
-        RNG(const RNG &r) : _rngVal(r._rngVal) { };
+        RNG(const RNG &r) : _rngVal(r._rngVal), _seed(r._seed) { };
 
         const long seed() { return _seed; }
 
