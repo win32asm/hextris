@@ -7,6 +7,7 @@
 
 #include <json/json.h>
 #include <vector>
+#include "Field.h"
 
 namespace icfp2015 {
     using std::vector;
@@ -16,8 +17,40 @@ namespace icfp2015 {
         vector<int> xList;
         vector<int> yList;
         int xbm, ybm, xbx, ybx; // bounding box
+
+        int maxRot;
     public:
         Unit() { }
+
+        Unit(const Unit &u) : pX(u.pX), pY(u.pY), xList(u.xList), yList(u.yList), maxRot(u.maxRot),
+                              xbm(u.xbm), ybm(u.ybm), xbx(u.xbx), ybx(u.ybx) { }
+
+        Unit &operator=(const Unit &u) {
+            pX = u.pX;
+            pY = u.pY;
+            xList = u.xList;
+            yList = u.yList;
+            maxRot = u.maxRot;
+            xbm = u.xbm;
+            ybm = u.ybm;
+            xbx = u.xbx;
+            ybx = u.ybx;
+            return *this;
+        }
+
+        const bool operator==(const Unit &u) {
+            bool hasPair = true;
+            for (int i = 0; i < xList.size() && hasPair; ++i) {
+                hasPair = false;
+                for (int j = 0; j < u.xList.size(); ++j) {
+                    if (xList[i] == u.xList[j] && yList[i] == u.yList[j]) {
+                        hasPair = true;
+                        break;
+                    }
+                }
+            }
+            return hasPair;
+        }
 
         Unit(const Json::Value uData) {
             xbm = ybm = 1000;
@@ -35,10 +68,16 @@ namespace icfp2015 {
                 if (ybm > y) ybm = y;
                 if (ybx < y) ybx = y;
             }
+
+            Unit copy(*this);
+            for (maxRot = 0; maxRot < 6; ++maxRot) {
+                copy.rotate(true);
+                if (copy == *this)
+                    break;
+            }
         }
 
-        Unit(const Unit &u) : pX(u.pX), pY(u.pY), xList(u.xList), yList(u.yList), xbm(u.xbm), ybm(u.ybm), xbx(u.xbx),
-                              ybx(u.ybx) { }
+        const int maxRotate() { return maxRot; }
 
         void rotate(bool cw) {
             xbm = ybm = 1000;
@@ -90,7 +129,42 @@ namespace icfp2015 {
             }
         }
 
-        void print() {
+        const bool Check(Field &f, int atx, int aty) {
+            for (int i = 0; i < xList.size(); ++i) {
+                int ptX = xList[i] + atx;
+                int ptY = yList[i] + aty;
+                if ((ptY & 1) == 0 && (aty & 1) == 1) ++ptX;
+                if (ptX < 0 || ptX >= f.width() || ptY < 0 || ptY >= f.height())
+                    return false;
+                if (f(ptX, ptY) == '*') // old figure ('F') is OK
+                    return false;
+            }
+            return true;
+        }
+
+        const void Apply(Field &f, int atx, int aty, bool erase = false) {
+            for (int i = 0; i < xList.size(); ++i) {
+                int ptX = xList[i] + atx;
+                int ptY = yList[i] + aty;
+                if ((ptY & 1) == 0 && (aty & 1) == 1) ++ptX;
+                if (erase) {
+                    f.clr(ptX, ptY);
+                } else {
+                    f.set(ptX, ptY);
+                }
+            }
+        }
+
+        const void Lock(Field &f, int atx, int aty) {
+            for (int i = 0; i < xList.size(); ++i) {
+                int ptX = xList[i] + atx;
+                int ptY = yList[i] + aty;
+                if ((ptY & 1) == 0 && (aty & 1) == 1) ++ptX;
+                f.set(ptX, ptY, true);
+            }
+        }
+
+        const void print() {
             vector<char> fld;
             printf("-----------------(%i, %i)\n", pX, pY);
             int wid = (xbx - xbm + 2);
@@ -113,17 +187,19 @@ namespace icfp2015 {
                 printf("\n");
             }
         }
+
+        int width();
     };
 
 // set of figures
     class Units {
         vector<Unit> list;
     public:
-        size_t num() { return list.size(); }
+        const size_t num() { return list.size(); }
 
         Units(const Json::Value &root);
 
-        const Unit &operator[](int i) { return list[i % list.size()]; }
+        const Unit &operator[](int i) const { return list[i % list.size()]; }
     };
 
 }

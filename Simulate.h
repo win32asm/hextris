@@ -18,11 +18,15 @@ namespace icfp2015 {
 
         Solution last;
         Unit curUnit;
+        int uX, uY; // unit coords
+        const int nUnits;
+        int nCurUnit;
     public:
-        Simulate(Field &f, const Units &u, RNG &g) : field(f), units(u), gen(g) { };
+        Simulate(Field &f, const Units &u, RNG &g, int maxU) : field(f), units(u), gen(g), nCurUnit(0),
+                                                               nUnits(maxU) { };
 
         bool nextUnit(); // returns true if figure can be placed
-        bool step(Actions a); // returns true if action didn`t lock
+        bool step(Actions a, bool verify = false); // returns true if action didn`t lock
         long score();
 
         long run(Solution &sol); // returns score, field not reset after.

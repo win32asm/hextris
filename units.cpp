@@ -13,4 +13,8 @@ namespace icfp2015 {
             list.push_back(nUnit);
         }
     }
+
+    int Unit::width() {
+        return xbx - xbm + 1;
+    }
 }

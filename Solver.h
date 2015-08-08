@@ -16,7 +16,7 @@ namespace icfp2015 {
     using std::vector;
 
     enum class Actions {
-        MoveE, MoveR, MoveSE, MoveSR, TurnCW, TurnCCW
+        MoveE, MoveW, MoveSE, MoveSW, TurnCW, TurnCCW
     };
 
     class Solution {

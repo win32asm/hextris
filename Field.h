@@ -7,6 +7,7 @@
 
 #include <json/json.h>
 #include <vector>
+#include <cstring>
 
 namespace icfp2015 {
     using  std::vector;
@@ -30,6 +31,10 @@ namespace icfp2015 {
             curfield = field;
         }
 
+        const unsigned width() { return wid; }
+
+        const unsigned height() { return hei; }
+
         void reset() {
             curfield = field;
         }
@@ -38,10 +43,9 @@ namespace icfp2015 {
             curfield[wid * y + x] = 0;
         }
 
-        void set(int x, int y) {
-            curfield[wid * y + x] = '*';
+        void set(int x, int y, bool locked = false) {
+            curfield[wid * y + x] = locked ? '*' : 'F';
         }
-
 
         const char operator()(int x, int y) {
             return curfield[wid * y + x];
@@ -51,18 +55,25 @@ namespace icfp2015 {
             for (int i = 0; i < hei; ++i) {
                 bool allSet = true;
                 for (int j = 0; j < wid; ++j) {
-                    printf(curfield[i * wid + j] ? ". " : "* ");
+                    allSet &= curfield[i * wid + j] == '*';
                 }
-                printf("\n");
+                if (allSet) {
+                    if (i != 0) {
+                        memmove(&curfield[wid], &curfield[0], i * wid);
+                    } else {
+                        memset(&curfield[0], 0, wid);
+                    }
+                }
             }
         }
 
-        void print() {
+        const void print() {
             printf("-----------------\n");
             for (int i = 0; i < hei; ++i) {
                 if (i & 1) printf(" ");
                 for (int j = 0; j < wid; ++j) {
-                    printf(curfield[i * wid + j] ? "* " : ". ");
+
+                    printf("%c ", curfield[i * wid + j] ?: '.');
                 }
                 printf("\n");
             }
