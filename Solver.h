@@ -30,7 +30,9 @@ namespace icfp2015 {
     class Solver {
 
     public:
-        Solver(icfp2015::RNG &value, Field &field, Units &units);
+        Solver(icfp2015::RNG &value, Field &field, Units &units) {
+
+        }
 
         Solution getSol() {
             Solution s;

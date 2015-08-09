@@ -43,6 +43,7 @@ bool icfp2015::Simulate::step(icfp2015::Actions a, bool verify) {
     }
     if (newUnit.Check(field, uXnew, uYnew)) { // can be placed
         if (!verify) {
+            last.code.push_back(a);
             curUnit.Apply(field, uX, uY, true); // erase
             curUnit = newUnit;
             uX = uXnew;
@@ -52,6 +53,7 @@ bool icfp2015::Simulate::step(icfp2015::Actions a, bool verify) {
         return true;
     } else {
         if (!verify) {
+            last.code.push_back(a);
             curUnit.Lock(field, uX, uY); // lock
             int sz = curUnit.size();
             int lines = field.simplify();
@@ -75,9 +77,12 @@ long icfp2015::Simulate::run(icfp2015::Solution &sol) {
         if (needFigure && !nextUnit()) {
             break;
         }
-
         needFigure = !step(a);
     }
 
     return score();
+}
+
+icfp2015::Solution icfp2015::Simulate::Moves() {
+    return last;
 }

@@ -28,13 +28,15 @@ namespace icfp2015 {
         Simulate(Field &f, const Units &u, RNG &g, int maxU) : field(f), units(u), gen(g), nCurUnit(0), curScore(0),
                                                                lastLines(0), nUnits(maxU) { };
 
-        bool nextUnit(); // returns true if figure can be placed
+        bool nextUnit(); // returns true if figure can be == is placed
         bool step(Actions a, bool verify = false); // returns true if action didn`t lock
-        long score() { return curScore; }
+        const long score() { return curScore; }
 
         long run(Solution &sol); // returns score, field not reset after.
 
         Solution getLast() { return last; }
+
+        Solution Moves();
     };
 }
 

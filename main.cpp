@@ -23,10 +23,13 @@ int main(int argc, char **argv) {
     string fName;
     Json::Reader x;
     Json::Value root;
-    bool printField = false, printUnits = false, showScore = false;
+    bool printField = false, printUnits = false, showScore = false, showPower = false;
 
-    while ((opt = getopt(argc, argv, "f:t:m:p:FUS")) >= 0) {
+    while ((opt = getopt(argc, argv, "f:t:m:p:FUSP")) >= 0) {
         switch (opt) {
+            case 'P':
+                showPower = true;
+                break;
             case 'F':
                 printField = true;
                 break;
@@ -82,9 +85,15 @@ int main(int argc, char **argv) {
     RNGSeeds s(root);
     long id = root["id"].asInt64();
     int maxUnits = root["sourceLength"].asInt();
+    Finder k(ofPower);
+    if (showPower) {
+        k.print();
+    }
+    Json::Value outRoot(Json::arrayValue);
 
     for (RNG &gen : s.list) {
         long seed = gen.seed();
+        f.reset();
         Simulate sim(f, u, gen, maxUnits);
 
         for (int i = 0; i < maxUnits; ++i) {
@@ -94,8 +103,6 @@ int main(int argc, char **argv) {
                 f.print();
             while (sim.step(Actions::MoveE, true)) {
                 sim.step(Actions::MoveE);
-                if (printField)
-                    f.print();
             }
             while (true) {
                 if (sim.step(Actions::MoveSE, true)) {
@@ -105,14 +112,21 @@ int main(int argc, char **argv) {
                 } else {
                     break;
                 }
-                if (printField)
-                    f.print();
             }
 
             while (sim.step(Actions::MoveW)) {
-                if (printField)
-                    f.print();
+                while (true) {
+                    if (sim.step(Actions::MoveSE, true)) {
+                        sim.step(Actions::MoveSE);
+                    } else if (sim.step(Actions::MoveSW, true)) {
+                        sim.step(Actions::MoveSW);
+                    } else {
+                        break;
+                    }
+                }
             }
+            if (printField)
+                f.print();
             //sim.step(Actions::MoveW);
             printf("-------------- Step %i complete\n", i);
         }
@@ -121,10 +135,15 @@ int main(int argc, char **argv) {
             printf("solution score: %li\n", sim.score());
         }
         //Solver c(sim, f);
-        //Solution sol = c.getSol();
-        //Finder k(sol, sim, ofPower);
-        //k.PrintSolution(id, seed);
-        return 0;
+        Solution sol = sim.Moves();
+
+
+        k.FormatSolution(sol, id, seed, outRoot);
+    }
+
+    {
+        Json::FastWriter fw;
+        printf("%s", fw.write(outRoot).c_str());
     }
 
     return 0;
