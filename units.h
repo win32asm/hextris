@@ -47,6 +47,9 @@ namespace icfp2015 {
                 yList[i] += y;
                 if ((yList[i] & 1) == 0 && (y & 1) == 1) ++xList[i];
             }
+            pX += x;
+            pY += y;
+            if ((pY & 1) == 0 && (y & 1) == 1) ++pX;
         }
 
         const bool operator==(const Unit &u) const {
@@ -60,7 +63,7 @@ namespace icfp2015 {
                     }
                 }
             }
-            return hasPair;
+            return hasPair && pX == u.pX && pY == u.pY;
         }
 
         Unit(const Json::Value uData) {

@@ -51,6 +51,30 @@ namespace icfp2015 {
 
         const unsigned height() { return hei; }
 
+        const unsigned penalty() {
+            vector<int> lock;
+            vector<int> free;
+            for (int line = 0; line < hei; ++line) {
+                bool locked = true;
+                int straight = 0;
+                int closed = 0;
+                for (int col = 0; col < wid; ++col) {
+                    if (locked ? (curfield[line * wid + col] != 0) : (curfield[line * wid + col] == 0)) {
+                        ++straight;
+                    } else {
+                        (locked ? lock : free).push_back(straight);
+                        locked = !locked;
+                        straight = 1;
+                    }
+                    if (line != 0) { // upper neighbors
+
+                    }
+                }
+                (locked ? lock : free).push_back(straight);
+            }
+        }
+
+
         void reset() {
             curfield = field;
         }

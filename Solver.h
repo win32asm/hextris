@@ -94,16 +94,17 @@ namespace icfp2015 {
             int downIdx = (side == Actions::MoveE) ? 0 : 1;
             Actions otherSide = (side == Actions::MoveE) ? Actions::MoveW : Actions::MoveE;
             while (true) {
-                if (sim.step(side, true) == VerifyState::Pass) {
+                VerifyState thisSideFail;
+                if ((thisSideFail = sim.step(side, true)) == VerifyState::Pass) {
                     sim.step(side);
-                }/* else if (sim.step(otherSide, true) == VerifyState::Pass){
-                    sim.step(otherSide);
-                }*/ else if (sim.step(down[downIdx], true) == VerifyState::Pass) {
+                } else if (sim.step(down[downIdx], true) == VerifyState::Pass) {
                     sim.step(down[downIdx]);
                 } else if (sim.step(down[downIdx + 1], true) == VerifyState::Pass) {
                     sim.step(down[downIdx + 1]);
                 } else if (sim.step(Actions::TurnCW, true) == VerifyState::Pass) {
                     sim.step(Actions::TurnCW);
+                } else if ((thisSideFail == VerifyState::Fail) && (sim.step(otherSide, true) == VerifyState::Pass)) {
+                    sim.step(otherSide);
                 } else {
                     break;
                 }
@@ -148,8 +149,11 @@ namespace icfp2015 {
                 Try_Settle(sim, printField, side);
 
                 // lock
-                if (sim.step(Actions::MoveSW) != VerifyState::Lock &&
-                    sim.step(Actions::MoveSE) != VerifyState::Lock) {
+                VerifyState mse, msw, ms, mas;
+                if ((msw = sim.step(Actions::MoveSW)) != VerifyState::Lock &&
+                    (mse = sim.step(Actions::MoveSE)) != VerifyState::Lock &&
+                    (ms = sim.step(side)) != VerifyState::Lock &&
+                    (mas = sim.step((side == Actions::MoveE) ? Actions::MoveW : Actions::MoveE)) != VerifyState::Lock) {
                     printf("\n\nHOLY CRAP!\n\n");
                 }
 
