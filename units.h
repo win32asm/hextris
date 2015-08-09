@@ -197,9 +197,17 @@ namespace icfp2015 {
             }
         }
 
-        int width() const;
+        int disp() const {
+            return xbm;
+        }
 
-        int size() const;
+        int width() const {
+            return xbx - xbm + 1;
+        }
+
+        int size() const {
+            return (int) xList.size();
+        }
 
         const int Orient() const { return orient; }
     };

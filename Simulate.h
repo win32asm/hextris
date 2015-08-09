@@ -67,7 +67,7 @@ namespace icfp2015 {
                     rslt += " CCW";
                     break;
             }
-            field.print(rslt);
+            field.print(rslt, true);
         }
 
         const Solution getLast() const { return last; }

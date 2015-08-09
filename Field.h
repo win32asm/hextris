@@ -51,7 +51,8 @@ namespace icfp2015 {
 
         const unsigned height() { return hei; }
 
-        const unsigned penalty() {
+        const long penalty() const {
+            long penalty = 0;
             vector<int> lock;
             vector<int> free;
             for (int line = 0; line < hei; ++line) {
@@ -66,12 +67,28 @@ namespace icfp2015 {
                         locked = !locked;
                         straight = 1;
                     }
-                    if (line != 0) { // upper neighbors
-
+                    if (line != 0 && !locked) { // upper neighbors for free spaces
+                        int prevIdx = (line & 1) ? col : (col - 1);
+                        if (prevIdx >= 0 && curfield[(line - 1) * wid + prevIdx] != 0)
+                            ++closed;
+                        if (curfield[(line - 1) * wid + prevIdx + 1] != 0)
+                            ++closed;
                     }
                 }
                 (locked ? lock : free).push_back(straight);
+
+                penalty += (lock.size() + free.size() - 1) * 10; // each interval + 10
+                penalty += 100 * closed; // each closed space + 100
+                if (lock[0] != 0) penalty -= 20; // locked from right or left
+                if (lock.size() > free.size()) penalty -= 20;
+
+                if (lock.size() != 0) {
+                    for (int sz:free) {
+                        penalty += 50 * (wid - sz);
+                    }
+                }
             }
+            return penalty;
         }
 
 
@@ -110,8 +127,12 @@ namespace icfp2015 {
             return removedLines;
         }
 
-        const void print(const string &s) const {
-            printf("----------------- %s\n", s.c_str());
+        const void print(const string &s, bool withPenalty = false) const {
+            if (withPenalty) {
+                printf("-----------------(%li) %s\n", penalty(), s.c_str());
+            } else {
+                printf("----------------- %s\n", s.c_str());
+            }
             _print();
             printf("-----------------");
         }

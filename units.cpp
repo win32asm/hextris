@@ -13,12 +13,4 @@ namespace icfp2015 {
             list.push_back(nUnit);
         }
     }
-
-    int Unit::width() const {
-        return xbx - xbm + 1;
-    }
-
-    int Unit::size() const {
-        return (int) xList.size();
-    }
 }

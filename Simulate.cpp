@@ -9,7 +9,7 @@ using namespace icfp2015;
 bool icfp2015::Simulate::nextUnit() {
     Unit nextUnit(units[gen()]);
     uY = 0;
-    uX = (field.width() - nextUnit.width()) / 2;
+    uX = (field.width() - nextUnit.width()) / 2 - nextUnit.disp();
     if (!nextUnit.Check(field, uX, uY)) {
         return false;
     }
