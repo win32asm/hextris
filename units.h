@@ -19,15 +19,17 @@ namespace icfp2015 {
         int xbm, ybm, xbx, ybx; // bounding box
 
         int maxRot;
+        int orient;
     public:
         Unit() { }
 
         Unit(const Unit &u) : pX(u.pX), pY(u.pY), xList(u.xList), yList(u.yList), maxRot(u.maxRot),
-                              xbm(u.xbm), ybm(u.ybm), xbx(u.xbx), ybx(u.ybx) { }
+                              xbm(u.xbm), ybm(u.ybm), xbx(u.xbx), ybx(u.ybx), orient(u.orient) { }
 
         Unit &operator=(const Unit &u) {
             pX = u.pX;
             pY = u.pY;
+            orient = u.orient;
             xList = u.xList;
             yList = u.yList;
             maxRot = u.maxRot;
@@ -127,6 +129,9 @@ namespace icfp2015 {
                 if (ybm > yO) ybm = yO;
                 if (ybx < yO) ybx = yO;
             }
+            orient += cw ? 1 : -1;
+            if (orient < 0) orient += maxRot + 1;
+            if (orient >= maxRot) orient %= maxRot;
         }
 
         const bool Check(Field &f, int atx, int aty) {
@@ -191,6 +196,8 @@ namespace icfp2015 {
         int width();
 
         int size();
+
+        int Orient() { return orient; }
     };
 
 // set of figures

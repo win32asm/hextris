@@ -3,7 +3,6 @@
 #include <getopt.h>
 #include <fstream>
 #include "Finder.h"
-#include "Simulate.h"
 
 using std::string;
 using std::vector;
@@ -23,10 +22,13 @@ int main(int argc, char **argv) {
     string fName;
     Json::Reader x;
     Json::Value root;
-    bool printField = false, printUnits = false, showScore = false, showPower = false;
+    bool printField = false, printUnits = false, showScore = false, showPower = false, runOne = false;
 
-    while ((opt = getopt(argc, argv, "f:t:m:p:FUSP")) >= 0) {
+    while ((opt = getopt(argc, argv, "f:t:m:p:FUSPO")) >= 0) {
         switch (opt) {
+            case 'O':
+                runOne = true;
+                break;
             case 'P':
                 showPower = true;
                 break;
@@ -93,52 +95,17 @@ int main(int argc, char **argv) {
 
     for (RNG &gen : s.list) {
         long seed = gen.seed();
-        f.reset();
-        Simulate sim(f, u, gen, maxUnits);
+        Solver slv(gen, f, u, k.Words());
 
-        for (int i = 0; i < maxUnits; ++i) {
+        int baseScore = (int) slv.Run(printField, maxUnits);
 
-            if (!sim.nextUnit()) break;
-            if (printField)
-                f.print();
-            while (sim.step(Actions::MoveE, true)) {
-                sim.step(Actions::MoveE);
-            }
-            while (true) {
-                if (sim.step(Actions::MoveSE, true)) {
-                    sim.step(Actions::MoveSE);
-                } else if (sim.step(Actions::MoveSW, true)) {
-                    sim.step(Actions::MoveSW);
-                } else {
-                    break;
-                }
-            }
-
-            while (sim.step(Actions::MoveW)) {
-                while (true) {
-                    if (sim.step(Actions::MoveSE, true)) {
-                        sim.step(Actions::MoveSE);
-                    } else if (sim.step(Actions::MoveSW, true)) {
-                        sim.step(Actions::MoveSW);
-                    } else {
-                        break;
-                    }
-                }
-            }
-            if (printField)
-                f.print();
-            //sim.step(Actions::MoveW);
-            printf("-------------- Step %i complete\n", i);
-        }
+        int powerScore = k.FormatSolution(slv.getSol(), id, seed, outRoot);
 
         if (showScore) {
-            printf("solution score: %li\n", sim.score());
+            printf("solution score: %i\n", baseScore + powerScore);
         }
-        //Solver c(sim, f);
-        Solution sol = sim.Moves();
-
-
-        k.FormatSolution(sol, id, seed, outRoot);
+        if (runOne)
+            break;
     }
 
     {

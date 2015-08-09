@@ -7,22 +7,19 @@
 
 #include <string>
 #include <vector>
+#include <algorithm>
+#include "Actions.h"
 #include "Solver.h"
 
 namespace icfp2015 {
     using std::vector;
     using std::string;
-
-    struct wordInfo {
-        vector<Actions> actions;
-        string wordOfPower;
-        string prepared;
-    };
+    using std::sort;
 
 // power word finder
     class Finder {
         Solution sol;
-        vector<wordInfo> words;
+        vector<WordInfo> words;
 
     public:
 #define allCases(a, b, c, d, e, f, g) case a: case b: case c: case d: case e: case f: newWord.prepared+=a; newWord.actions.push_back(g); break
@@ -30,7 +27,7 @@ namespace icfp2015 {
         Finder(vector<string> ofPower) {
             // convert
             for (string &line:ofPower) {
-                wordInfo newWord;
+                WordInfo newWord;
                 newWord.wordOfPower = line;
 
                 for (int i = 0; i < line.size(); ++i) {
@@ -53,11 +50,15 @@ namespace icfp2015 {
                 }
                 words.push_back(newWord);
             }
+            // format by length
+            std::sort(words.begin(), words.end(), [](const WordInfo &a, const WordInfo &b) -> bool {
+                return a.wordOfPower.size() >= b.wordOfPower.size();
+            });
         };
 #undef allCases
 
         const void print() {
-            for (const wordInfo &wi: words) {
+            for (const WordInfo &wi: words) {
                 printf("Word: '%s', preprocessed: '%s', Moves: [", wi.wordOfPower.c_str(), wi.prepared.c_str());
                 for (Actions a:wi.actions) {
                     switch (a) {
@@ -85,7 +86,8 @@ namespace icfp2015 {
             }
         }
 
-        void FormatSolution(const Solution &moves, long id, long seed, Json::Value &root) {
+        const int FormatSolution(const Solution &moves, long id, long seed, Json::Value &root) {
+            int bonus;
             string sLine;
             for (Actions a:moves.code) {
                 switch (a) {
@@ -109,24 +111,32 @@ namespace icfp2015 {
                         break;
                 }
             }
-            for (const wordInfo &wi: words) {
+            for (const WordInfo &wi: words) {
                 string::size_type idx = 0;
+                int numRep = 0;
                 while ((idx = sLine.find(wi.prepared, idx)) != string::npos) {
+                    ++numRep;
                     sLine.replace(idx, wi.prepared.size(), wi.wordOfPower);
                     idx += wi.prepared.size();
+                }
+                if (numRep) {
+                    bonus += 300 + numRep * 2 * wi.wordOfPower.size();
                 }
             }
 
             Json::Value sub(Json::objectValue);
             sub["problemId"] = Json::Value::Int(id);
             sub["seed"] = Json::Value::Int(seed);
-            sub["tag"] = string("B@OBab v1.0");
+            sub["tag"] = string("B@OBab v1.2t");
             sub["solution"] = sLine;
             root.append(sub);
+            return bonus;
+        }
+
+        const vector<WordInfo> &Words() {
+            return words;
         }
     };
-
-//#include "main.cpp"
 
 }
 #endif //ICFP2015_FINDER_H

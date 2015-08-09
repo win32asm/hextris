@@ -4,6 +4,8 @@
 
 #include "Simulate.h"
 
+using namespace icfp2015;
+
 bool icfp2015::Simulate::nextUnit() {
     Unit nextUnit(units[gen()]);
     uY = 0;
@@ -13,10 +15,12 @@ bool icfp2015::Simulate::nextUnit() {
     }
     nextUnit.Apply(field, uX, uY);
     curUnit = nextUnit;
+    unitPath.Reset();
+    unitPath.Save(uX, uY, curUnit.Orient());
     return true;
 }
 
-bool icfp2015::Simulate::step(icfp2015::Actions a, bool verify) {
+VerifyState icfp2015::Simulate::step(Actions a, bool verify) {
     int uXnew = uX, uYnew = uY;
     Unit newUnit = curUnit;
     switch (a) {
@@ -41,6 +45,11 @@ bool icfp2015::Simulate::step(icfp2015::Actions a, bool verify) {
             newUnit.rotate(false);
             break;
     }
+
+    if (!unitPath.Verify(uXnew, uYnew, newUnit.Orient())) {
+        return VerifyState::Fail;
+    }
+
     if (newUnit.Check(field, uXnew, uYnew)) { // can be placed
         if (!verify) {
             last.code.push_back(a);
@@ -49,8 +58,9 @@ bool icfp2015::Simulate::step(icfp2015::Actions a, bool verify) {
             uX = uXnew;
             uY = uYnew;
             curUnit.Apply(field, uX, uY); // draw
+            unitPath.Save(uX, uY, curUnit.Orient());
         }
-        return true;
+        return VerifyState::Pass;
     } else {
         if (!verify) {
             last.code.push_back(a);
@@ -61,12 +71,12 @@ bool icfp2015::Simulate::step(icfp2015::Actions a, bool verify) {
             curScore += pts + (lastLines - 1) * pts / 10;
             lastLines = lines;
         }
-        return false;
+        return VerifyState::Lock;
     }
 }
 
-long icfp2015::Simulate::run(icfp2015::Solution &sol) {
-    bool needFigure = true;
+long icfp2015::Simulate::run(Solution &sol) {
+    /*bool needFigure = true;
     field.reset();
     gen.reset();
     last.reset();
@@ -80,9 +90,10 @@ long icfp2015::Simulate::run(icfp2015::Solution &sol) {
         needFigure = !step(a);
     }
 
-    return score();
+    return score();*/
+    return 0;
 }
 
-icfp2015::Solution icfp2015::Simulate::Moves() {
+Solution icfp2015::Simulate::Moves() {
     return last;
 }
