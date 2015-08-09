@@ -13,6 +13,13 @@ namespace icfp2015 {
     using std::vector;
     using std::string;
 
+    enum PrintData {
+        PRINT_FIELD = 1,
+        PRINT_START,
+        PRINT_STEP,
+        PRINT_ALL
+    };
+
     enum class Actions {
         MoveE, MoveW, MoveSE, MoveSW, TurnCW, TurnCCW
     };

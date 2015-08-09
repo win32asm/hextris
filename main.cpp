@@ -22,7 +22,8 @@ int main(int argc, char **argv) {
     string fName;
     Json::Reader x;
     Json::Value root;
-    bool printField = false, printUnits = false, showScore = false, showPower = false, runOne = false;
+    bool printUnits = false, showScore = false, showPower = false, runOne = false;
+    int printField = 0;
 
     while ((opt = getopt(argc, argv, "f:t:m:p:FUSPO")) >= 0) {
         switch (opt) {
@@ -33,7 +34,7 @@ int main(int argc, char **argv) {
                 showPower = true;
                 break;
             case 'F':
-                printField = true;
+                ++printField;
                 break;
             case 'U':
                 printUnits = true;
@@ -92,6 +93,7 @@ int main(int argc, char **argv) {
         k.print();
     }
     Json::Value outRoot(Json::arrayValue);
+    long allScores = 0;
 
     for (RNG &gen : s.list) {
         long seed = gen.seed();
@@ -103,9 +105,14 @@ int main(int argc, char **argv) {
 
         if (showScore) {
             printf("solution score: %i\n", baseScore + powerScore);
+            allScores += baseScore + powerScore;
         }
         if (runOne)
             break;
+    }
+
+    if (showScore) {
+        printf("board score: %li\n", allScores / s.list.size());
     }
 
     {

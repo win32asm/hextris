@@ -127,7 +127,7 @@ namespace icfp2015 {
             Json::Value sub(Json::objectValue);
             sub["problemId"] = Json::Value::Int(id);
             sub["seed"] = Json::Value::Int(seed);
-            sub["tag"] = string("B@OBab v1.2t");
+            sub["tag"] = string((words.size() == 0) ? "B@OBab v1.3" : "B@OBab v1.3t");
             sub["solution"] = sLine;
             root.append(sub);
             return bonus;

@@ -38,11 +38,83 @@ namespace icfp2015 {
             return true;
         }
 
+        void Try_Words(Simulate &sim, int printField) {
+            bool hasSequences;
+            do {
+                hasSequences = false;
+                for (const WordInfo &wi:words) {
+                    if (TrySequence(sim, wi.actions)) {
+                        for (Actions a:wi.actions) {
+                            sim.step(a);
+                            if (printField >= PRINT_ALL)
+                                sim.print();
+                        }
+                        hasSequences = true;
+                        break; // one per unit?
+                    }
+                }
+            } while (hasSequences);
+            if (printField >= PRINT_STEP)
+                sim.print();
+        }
+
+        void Try_Shift(Simulate &sim, Actions dir, int printField) {
+            while (sim.step(dir, true) == VerifyState::Pass) {
+                sim.step(dir);
+                if (printField >= PRINT_ALL)
+                    sim.print();
+            }
+
+            if (printField >= PRINT_STEP)
+                sim.print();
+        }
+
+        void Try_Drop(Simulate &sim, int printField, Actions side = Actions::MoveE, int height = -1) {
+
+            Actions down[3] = {Actions::MoveSE, Actions::MoveSW, Actions::MoveSE}; // hack
+            int downIdx = (side == Actions::MoveE) ? 0 : 1;
+            while ((height--) != 0) {
+                if (sim.step(down[downIdx], true) == VerifyState::Pass) {
+                    sim.step(down[downIdx]);
+                } else if (sim.step(down[downIdx + 1], true) == VerifyState::Pass) {
+                    sim.step(down[downIdx + 1]);
+                } else {
+                    break;
+                }
+                if (printField >= PRINT_ALL)
+                    sim.print();
+            }
+
+            if (printField >= PRINT_STEP)
+                sim.print();
+        }
+
+        void Try_Settle(Simulate &sim, int printField, Actions side = Actions::MoveE) {
+            Actions down[3] = {Actions::MoveSE, Actions::MoveSW, Actions::MoveSE}; // hack
+            int downIdx = (side == Actions::MoveE) ? 0 : 1;
+            while (true) {
+                if (sim.step(side, true) == VerifyState::Pass) {
+                    sim.step(side);
+                } else if (sim.step(down[downIdx], true) == VerifyState::Pass) {
+                    sim.step(down[downIdx]);
+                } else if (sim.step(down[downIdx + 1], true) == VerifyState::Pass) {
+                    sim.step(down[downIdx + 1]);
+                } else if (sim.step(Actions::TurnCW, true) == VerifyState::Pass) {
+                    sim.step(Actions::TurnCW);
+                } else {
+                    break;
+                }
+                if (printField >= PRINT_ALL)
+                    sim.print();
+            }
+        }
+
     public:
+
         Solver(const icfp2015::RNG &rng, Field &f, const Units &u, const vector<WordInfo> &w) : field(f), units(u),
                                                                                                 gen(rng), words(w) { }
 
-        long Run(bool printField, int maxUnits) {
+        long Run(int printField, int maxUnits) {
             field.reset();
 
             Simulate sim(field, units, gen, maxUnits);
@@ -51,64 +123,23 @@ namespace icfp2015 {
 
                 if (!sim.nextUnit()) break;
 
-                if (printField)
+                if (printField >= PRINT_START)
                     sim.print();
 
-                bool hasSequences;
-                Actions lastMove = Actions::MoveE;
-                do {
-                    hasSequences = false;
-                    for (const WordInfo &wi:words) {
-                        if (TrySequence(sim, wi.actions)) {
-                            for (Actions a:wi.actions) {
-                                sim.step(a);
-                                if (a == Actions::MoveE || a == Actions::MoveW)
-                                    lastMove = a;
-                            }
-                            hasSequences = true;
-                            break; // one per unit?
-                        }
-                    }
-                } while (hasSequences);
+                Try_Words(sim, printField);
 
-                if (printField)
-                    sim.print();
+                Actions side = (sim.step(Actions::MoveE, true) == VerifyState::Pass) ? Actions::MoveE : Actions::MoveW;
 
-                while (sim.step(lastMove, true) == VerifyState::Pass) {
-                    sim.step(lastMove);
-                }
+                Try_Shift(sim, side, printField);
 
-                if (printField)
-                    sim.print();
+                Try_Words(sim, printField);
+
+                Try_Drop(sim, printField, side);
 
                 // invert move
-                lastMove = (lastMove == Actions::MoveE) ? Actions::MoveW : Actions::MoveE;
+                side = (side == Actions::MoveE) ? Actions::MoveW : Actions::MoveE;
 
-                while (true) {
-                    if (sim.step(Actions::MoveSE, true) == VerifyState::Pass) {
-                        sim.step(Actions::MoveSE);
-                    } else if (sim.step(Actions::MoveSW, true) == VerifyState::Pass) {
-                        sim.step(Actions::MoveSW);
-                    } else {
-                        break;
-                    }
-                    if (printField)
-                        sim.print();
-                }
-
-                while (true) {
-                    if (sim.step(lastMove, true) == VerifyState::Pass) {
-                        sim.step(lastMove);
-                    } else if (sim.step(Actions::MoveSE, true) == VerifyState::Pass) {
-                        sim.step(Actions::MoveSE);
-                    } else if (sim.step(Actions::MoveSW, true) == VerifyState::Pass) {
-                        sim.step(Actions::MoveSW);
-                    } else {
-                        break;
-                    }
-                    if (printField)
-                        sim.print();
-                }
+                Try_Settle(sim, printField, side);
 
                 // lock
                 if (sim.step(Actions::MoveSW) != VerifyState::Lock &&
@@ -116,7 +147,7 @@ namespace icfp2015 {
                     printf("\n\nHOLY CRAP!\n\n");
                 }
 
-                if (printField) {
+                if (printField >= PRINT_START) {
                     sim.print();
                     printf("-------------- Step %i complete\n", i);
                 }
