@@ -70,6 +70,8 @@ namespace icfp2015 {
                 if (ybm > y) ybm = y;
                 if (ybx < y) ybx = y;
             }
+            orient = 0;
+            maxRot = 6;
 
             Unit copy(*this);
             for (maxRot = 0; maxRot < 6; ++maxRot) {
@@ -129,9 +131,11 @@ namespace icfp2015 {
                 if (ybm > yO) ybm = yO;
                 if (ybx < yO) ybx = yO;
             }
-            orient += cw ? 1 : -1;
-            if (orient < 0) orient += maxRot + 1;
-            if (orient >= maxRot) orient %= (maxRot + 1);
+            if (maxRot != 0) {
+                orient += cw ? 1 : -1;
+                if (orient < 0) orient += maxRot + 1;
+                if (orient > maxRot) orient %= (maxRot + 1);
+            }
         }
 
         const bool Check(Field &f, int atx, int aty) {
