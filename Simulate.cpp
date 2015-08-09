@@ -15,7 +15,7 @@ bool icfp2015::Simulate::nextUnit() {
     }
     nextUnit.Apply(field, uX, uY);
     curUnit = nextUnit;
-    unitPath.Reset();
+    unitPath.Reset(nextUnit);
     unitPath.Save(uX, uY, curUnit.Orient());
     return true;
 }

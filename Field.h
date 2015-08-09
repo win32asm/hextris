@@ -8,15 +8,31 @@
 #include <json/json.h>
 #include <vector>
 #include <cstring>
+#include <string>
+#include "Actions.h"
 
 namespace icfp2015 {
-    using  std::vector;
+    using std::vector;
+    using std::string;
 // field
     class Field {
         vector<char> field;     // original state
         vector<char> curfield;  // updated state
         unsigned int wid;
         unsigned int hei;
+
+        const void _print() const {
+            for (int i = 0; i < hei; ++i) {
+                if (i & 1) printf(" ");
+                for (int j = 0; j < wid; ++j) {
+
+                    printf("%c ", curfield[i * wid + j] ?: '.');
+                }
+                printf("\n");
+            }
+            printf("-----------------\n");
+        }
+
     public:
         Field(const Json::Value &root) {
             wid = root["width"].asUInt();
@@ -70,17 +86,10 @@ namespace icfp2015 {
             return removedLines;
         }
 
-        const void print() {
-            printf("-----------------\n");
-            for (int i = 0; i < hei; ++i) {
-                if (i & 1) printf(" ");
-                for (int j = 0; j < wid; ++j) {
-
-                    printf("%c ", curfield[i * wid + j] ?: '.');
-                }
-                printf("\n");
-            }
-            printf("-----------------\n");
+        const void print(const string &s) const {
+            printf("----------------- %s\n", s.c_str());
+            _print();
+            printf("-----------------");
         }
     };
 

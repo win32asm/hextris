@@ -18,12 +18,11 @@ namespace icfp2015 {
         vector<int> yList;
         int xbm, ybm, xbx, ybx; // bounding box
 
-        int maxRot;
         int orient;
     public:
         Unit() { }
 
-        Unit(const Unit &u) : pX(u.pX), pY(u.pY), xList(u.xList), yList(u.yList), maxRot(u.maxRot),
+        Unit(const Unit &u) : pX(u.pX), pY(u.pY), xList(u.xList), yList(u.yList),
                               xbm(u.xbm), ybm(u.ybm), xbx(u.xbx), ybx(u.ybx), orient(u.orient) { }
 
         Unit &operator=(const Unit &u) {
@@ -32,7 +31,6 @@ namespace icfp2015 {
             orient = u.orient;
             xList = u.xList;
             yList = u.yList;
-            maxRot = u.maxRot;
             xbm = u.xbm;
             ybm = u.ybm;
             xbx = u.xbx;
@@ -40,7 +38,18 @@ namespace icfp2015 {
             return *this;
         }
 
-        const bool operator==(const Unit &u) {
+        void Translate(int x, int y, int newori) {
+            while (orient != newori) {
+                rotate(true);
+            }
+            for (int i = 0; i < xList.size(); ++i) {
+                xList[i] += x;
+                yList[i] += y;
+                if ((yList[i] & 1) == 0 && (y & 1) == 1) ++xList[i];
+            }
+        }
+
+        const bool operator==(const Unit &u) const {
             bool hasPair = true;
             for (int i = 0; i < xList.size() && hasPair; ++i) {
                 hasPair = false;
@@ -71,17 +80,7 @@ namespace icfp2015 {
                 if (ybx < y) ybx = y;
             }
             orient = 0;
-            maxRot = 6;
-
-            Unit copy(*this);
-            for (maxRot = 0; maxRot < 6; ++maxRot) {
-                copy.rotate(true);
-                if (copy == *this)
-                    break;
-            }
         }
-
-        const int maxRotate() { return maxRot; }
 
         void rotate(bool cw) {
             xbm = ybm = 1000;
@@ -131,11 +130,9 @@ namespace icfp2015 {
                 if (ybm > yO) ybm = yO;
                 if (ybx < yO) ybx = yO;
             }
-            if (maxRot != 0) {
-                orient += cw ? 1 : -1;
-                if (orient < 0) orient += maxRot + 1;
-                if (orient > maxRot) orient %= (maxRot + 1);
-            }
+            orient += cw ? 1 : -1;
+            if (orient < 0) orient += 6;
+            if (orient >= 6) orient %= 6;
         }
 
         const bool Check(Field &f, int atx, int aty) {
@@ -197,11 +194,11 @@ namespace icfp2015 {
             }
         }
 
-        int width();
+        int width() const;
 
-        int size();
+        int size() const;
 
-        int Orient() { return orient; }
+        const int Orient() const { return orient; }
     };
 
 // set of figures
@@ -213,6 +210,33 @@ namespace icfp2015 {
         Units(const Json::Value &root);
 
         const Unit &operator[](int i) const { return list[i % list.size()]; }
+    };
+
+    class Path {
+        vector<Unit> uPath;
+        Unit base;
+    public:
+
+        void Reset(const Unit &newUnit) {
+            base = newUnit;
+            uPath.clear();
+        }
+
+        bool Verify(int x, int y, int ori) {
+            Unit next(base);
+            next.Translate(x, y, ori);
+            for (const Unit &u:uPath) {
+                if (u == next)
+                    return false;
+            }
+            return true;
+        }
+
+        void Save(int x, int y, int ori) {
+            Unit next(base);
+            next.Translate(x, y, ori);
+            uPath.push_back(next);
+        }
     };
 
 }

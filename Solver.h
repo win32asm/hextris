@@ -55,7 +55,7 @@ namespace icfp2015 {
                 }
             } while (hasSequences);
             if (printField >= PRINT_STEP)
-                sim.print();
+                sim.print("After word search");
         }
 
         void Try_Shift(Simulate &sim, Actions dir, int printField) {
@@ -66,7 +66,7 @@ namespace icfp2015 {
             }
 
             if (printField >= PRINT_STEP)
-                sim.print();
+                sim.print("After shift");
         }
 
         void Try_Drop(Simulate &sim, int printField, Actions side = Actions::MoveE, int height = -1) {
@@ -86,16 +86,19 @@ namespace icfp2015 {
             }
 
             if (printField >= PRINT_STEP)
-                sim.print();
+                sim.print("After drop");
         }
 
         void Try_Settle(Simulate &sim, int printField, Actions side = Actions::MoveE) {
             Actions down[3] = {Actions::MoveSE, Actions::MoveSW, Actions::MoveSE}; // hack
             int downIdx = (side == Actions::MoveE) ? 0 : 1;
+            Actions otherSide = (side == Actions::MoveE) ? Actions::MoveW : Actions::MoveE;
             while (true) {
                 if (sim.step(side, true) == VerifyState::Pass) {
                     sim.step(side);
-                } else if (sim.step(down[downIdx], true) == VerifyState::Pass) {
+                }/* else if (sim.step(otherSide, true) == VerifyState::Pass){
+                    sim.step(otherSide);
+                }*/ else if (sim.step(down[downIdx], true) == VerifyState::Pass) {
                     sim.step(down[downIdx]);
                 } else if (sim.step(down[downIdx + 1], true) == VerifyState::Pass) {
                     sim.step(down[downIdx + 1]);
@@ -107,6 +110,9 @@ namespace icfp2015 {
                 if (printField >= PRINT_ALL)
                     sim.print();
             }
+
+            if (printField >= PRINT_STEP)
+                sim.print("After Settle");
         }
 
     public:
@@ -124,7 +130,7 @@ namespace icfp2015 {
                 if (!sim.nextUnit()) break;
 
                 if (printField >= PRINT_START)
-                    sim.print();
+                    sim.print("At start");
 
                 Try_Words(sim, printField);
 
@@ -148,7 +154,7 @@ namespace icfp2015 {
                 }
 
                 if (printField >= PRINT_START) {
-                    sim.print();
+                    sim.print("At end");
                     printf("-------------- Step %i complete\n", i);
                 }
             }

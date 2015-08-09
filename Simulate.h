@@ -41,9 +41,36 @@ namespace icfp2015 {
 
         long run(Solution &sol); // returns score, field not reset after.
 
-        void print() { field.print(); }
+        const void print(const string &note) const { field.print(note); }
 
-        Solution getLast() { return last; }
+        const void print() const {
+            char buf[120];
+            snprintf(buf, 120, "@(%i, %i %% %i) after", uX, uY, curUnit.Orient());
+            string rslt(buf);
+            switch (last.code.back()) {
+                case Actions::MoveW:
+                    rslt += " W";
+                    break;
+                case Actions::MoveE:
+                    rslt += " E";
+                    break;
+                case Actions::MoveSW:
+                    rslt += " SW";
+                    break;
+                case Actions::MoveSE:
+                    rslt += " SE";
+                    break;
+                case Actions::TurnCW:
+                    rslt += " CW";
+                    break;
+                case Actions::TurnCCW:
+                    rslt += " CCW";
+                    break;
+            }
+            field.print(rslt);
+        }
+
+        const Solution getLast() const { return last; }
 
         Solution Moves();
     };

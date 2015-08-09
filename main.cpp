@@ -71,16 +71,17 @@ int main(int argc, char **argv) {
 
     Field f(root);
     if (printField)
-        f.print();
+        f.print(string("Initial field status"));
 
     Units u(root);
     if (printUnits) {
         for (int i = 0; i < u.num(); ++i) {
             Unit tmp = u[i];
             printf("------- unit %i\n", i);
-            for (int j = tmp.maxRotate(); j >= 0; --j) {
+            for (int j = 0; j < 6; ++j) {
                 tmp.print();
                 tmp.rotate(true);
+                if (tmp == u[i]) break;
             }
         }
     }

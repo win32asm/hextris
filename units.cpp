@@ -14,11 +14,11 @@ namespace icfp2015 {
         }
     }
 
-    int Unit::width() {
+    int Unit::width() const {
         return xbx - xbm + 1;
     }
 
-    int Unit::size() {
+    int Unit::size() const {
         return (int) xList.size();
     }
 }

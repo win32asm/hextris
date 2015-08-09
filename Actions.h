@@ -31,34 +31,6 @@ namespace icfp2015 {
         std::string prepared;
     };
 
-    class Path {
-        vector<int> xPath;
-        vector<int> yPath;
-        vector<int> orient;
-
-    public:
-
-        void Reset() {
-            xPath.clear();
-            yPath.clear();
-            orient.clear();
-        }
-
-        bool Verify(int x, int y, int ori) {
-            for (int i = 0; i < xPath.size(); ++i) {
-                if (xPath[i] == x && yPath[i] == y && orient[i] == ori)
-                    return false;
-            }
-            return true;
-        }
-
-        void Save(int x, int y, int ori) {
-            xPath.push_back(x);
-            yPath.push_back(y);
-            orient.push_back(ori);
-        }
-    };
-
     class Solution {
     public:
         std::vector<Actions> code;
