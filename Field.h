@@ -10,6 +10,7 @@
 #include <cstring>
 #include <string>
 #include "Actions.h"
+#include "Logger.h"
 
 namespace icfp2015 {
     using std::vector;
@@ -20,18 +21,6 @@ namespace icfp2015 {
         vector<char> curfield;  // updated state
         unsigned int wid;
         unsigned int hei;
-
-        const void _print() const {
-            for (int i = 0; i < hei; ++i) {
-                if (i & 1) printf(" ");
-                for (int j = 0; j < wid; ++j) {
-
-                    printf("%c ", curfield[i * wid + j] ?: '.');
-                }
-                printf("\n");
-            }
-            printf("-----------------\n");
-        }
 
     public:
         Field(const Json::Value &root) {
@@ -129,12 +118,19 @@ namespace icfp2015 {
 
         const void print(const string &s, bool withPenalty = false) const {
             if (withPenalty) {
-                printf("-----------------(%li) %s\n", penalty(), s.c_str());
+                glbLog() << "-----------------(" << penalty() << ") " << s.c_str() << endl;
             } else {
-                printf("----------------- %s\n", s.c_str());
+                glbLog() << "-----------------" << s.c_str() << endl;
             }
-            _print();
-            printf("-----------------");
+
+            for (int i = 0; i < hei; ++i) {
+                if (i & 1) glbLog() << ' ';
+                for (int j = 0; j < wid; ++j) {
+                    glbLog() << (curfield[i * wid + j] ?: '.') << ' ';
+                }
+                glbLog() << endl;
+            }
+            glbLog() << "-----------------" << endl;
         }
     };
 

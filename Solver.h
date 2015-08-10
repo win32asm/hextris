@@ -50,12 +50,11 @@ namespace icfp2015 {
                                 sim.print();
                         }
                         hasSequences = true;
-                        break; // one per unit?
+                        if (printField >= PRINT_STEP)
+                            sim.print(string("after word ") + wi.wordOfPower);
                     }
                 }
             } while (hasSequences);
-            if (printField >= PRINT_STEP)
-                sim.print("After word search");
         }
 
         void Try_Shift(Simulate &sim, Actions dir, int printField) {
@@ -70,18 +69,27 @@ namespace icfp2015 {
         }
 
         void Try_Shift_Words(Simulate &sim, int printField) {
+            while (true) {
+                Try_Words(sim, printField);
 
-            Actions side = (sim.step(Actions::MoveE, true) == VerifyState::Pass) ? Actions::MoveE : Actions::MoveW;
+                if (sim.step(Actions::MoveE, true) == VerifyState::Pass) {
+                    sim.step(Actions::MoveE);
+                } else if (sim.step(Actions::MoveW, true) == VerifyState::Pass) {
+                    sim.step(Actions::MoveW);
+                } else /* if (sim.step(Actions::MoveSE, true) == VerifyState::Pass) {
+                    sim.step(Actions::MoveSE);
+                } else if (sim.step(Actions::MoveSW, true) == VerifyState::Pass) {
+                    sim.step(Actions::MoveSW);
+                } else */ {
+                    break;
+                }
 
-            while (sim.step(side, true) == VerifyState::Pass) {
-                sim.step(side);
                 if (printField >= PRINT_ALL)
                     sim.print();
-                Try_Words(sim, printField);
             }
 
             if (printField >= PRINT_STEP)
-                sim.print("After shift");
+                sim.print("After shift+words");
         }
 
         void Try_Drop(Simulate &sim, int printField, Actions side = Actions::MoveE, int height = -1) {
@@ -160,7 +168,7 @@ namespace icfp2015 {
 
                 //Try_Words(sim, printField);
 
-                Try_Drop(sim, printField, side);
+                //Try_Drop(sim, printField, side);
 
                 // invert move
                 side = (side == Actions::MoveE) ? Actions::MoveW : Actions::MoveE;
@@ -173,12 +181,12 @@ namespace icfp2015 {
                     (mse = sim.step(Actions::MoveSE)) != VerifyState::Lock &&
                     (ms = sim.step(side)) != VerifyState::Lock &&
                     (mas = sim.step((side == Actions::MoveE) ? Actions::MoveW : Actions::MoveE)) != VerifyState::Lock) {
-                    printf("\n\nHOLY CRAP!\n\n");
+                    glbLog() << "\n\nHOLY CRAP!\n\n" << endl;
                 }
 
                 if (printField >= PRINT_START) {
                     sim.print("At end");
-                    printf("-------------- Step %i complete\n", i);
+                    glbLog() << "-------------- Step " << i << " complete" << endl;
                 }
             }
 

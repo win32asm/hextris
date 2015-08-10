@@ -69,6 +69,11 @@ int main(int argc, char **argv) {
         x.parse(file, root, false);
     }
 
+    long id = root["id"].asInt64();
+
+    if (printField || printUnits || showPower || showScore)
+        glbLog.Setup(id);
+
     Field f(root);
     if (printField)
         f.print(string("Initial field status"));
@@ -77,7 +82,7 @@ int main(int argc, char **argv) {
     if (printUnits) {
         for (int i = 0; i < u.num(); ++i) {
             Unit tmp = u[i];
-            printf("------- unit %i\n", i);
+            glbLog() << "------- unit " << i << endl;
             for (int j = 0; j < 6; ++j) {
                 tmp.print();
                 tmp.rotate(true);
@@ -87,7 +92,7 @@ int main(int argc, char **argv) {
     }
 
     RNGSeeds s(root);
-    long id = root["id"].asInt64();
+
     int maxUnits = root["sourceLength"].asInt();
     Finder k(ofPower);
     if (showPower) {
@@ -105,7 +110,7 @@ int main(int argc, char **argv) {
         int powerScore = k.FormatSolution(slv.getSol(), id, seed, outRoot);
 
         if (showScore) {
-            printf("solution score: %i\n", baseScore + powerScore);
+            glbLog() << "solution score: " << baseScore + powerScore << endl;
             allScores += baseScore + powerScore;
         }
         if (runOne)
@@ -113,7 +118,7 @@ int main(int argc, char **argv) {
     }
 
     if (showScore) {
-        printf("board score: %li\n", allScores / s.list.size());
+        glbLog() << "board score: " << allScores / s.list.size() << endl;
     }
 
     {

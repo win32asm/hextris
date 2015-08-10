@@ -59,30 +59,30 @@ namespace icfp2015 {
 
         const void print() {
             for (const WordInfo &wi: words) {
-                printf("Word: '%s', preprocessed: '%s', Moves: [", wi.wordOfPower.c_str(), wi.prepared.c_str());
+                glbLog() << "Word: '" << wi.wordOfPower << "', preprocessed: '" << wi.prepared << "', Moves: [";
                 for (Actions a:wi.actions) {
                     switch (a) {
                         case Actions::MoveW:
-                            printf("W ");
+                            glbLog() << "W ";
                             break;
                         case Actions::MoveE:
-                            printf("E ");
+                            glbLog() << "E ";
                             break;
                         case Actions::MoveSW:
-                            printf("SW ");
+                            glbLog() << "SW ";
                             break;
                         case Actions::MoveSE:
-                            printf("SE ");
+                            glbLog() << "SE ";
                             break;
                         case Actions::TurnCW:
-                            printf("CW ");
+                            glbLog() << "CW ";
                             break;
                         case Actions::TurnCCW:
-                            printf("CC ");
+                            glbLog() << "CC ";
                             break;
                     }
                 }
-                printf("\n");
+                glbLog() << "]" << endl;
             }
         }
 

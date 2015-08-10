@@ -175,7 +175,7 @@ namespace icfp2015 {
 
         const void print() {
             vector<char> fld;
-            printf("-----------------(%i, %i)\n", pX, pY);
+            glbLog() << "-----------------(" << pX << ", " << pY << ")" << endl;
             int wid = (xbx - xbm + 2);
             int hei = (ybx - ybm + 2 + (ybm & 1));
             fld.resize(wid * hei);
@@ -184,16 +184,16 @@ namespace icfp2015 {
                 int yO = yList[i] - ybm + (ybm & 1); // move by even N of rows
                 int idx = xO + yO * wid;
                 fld[idx] = '*';
-                printf("(%i, %i),", xO + xbm, yO + ybm);
+                glbLog() << "(" << xO + xbm << "," << yO + ybm << ")";
             }
-            printf("\n");
+            glbLog() << endl;
 
             for (int i = 0; i < hei; ++i) {
-                if (i & 1) printf(" ");
+                if (i & 1) glbLog() << ' ';
                 for (int j = 0; j < wid; ++j) {
-                    printf("%c ", fld[i * wid + j] ?: '.');
+                    glbLog() << (fld[i * wid + j] ?: '.') << ' ';
                 }
-                printf("\n");
+                glbLog() << endl;
             }
         }
 
