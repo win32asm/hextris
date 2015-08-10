@@ -68,7 +68,7 @@ namespace icfp2015 {
                 sim.print("After shift");
         }
 
-        void Try_Shift_Words(Simulate &sim, int printField) {
+        void Try_Shift_Words(Simulate &sim, int printField, bool allowDrop = false) {
             while (true) {
                 Try_Words(sim, printField);
 
@@ -76,11 +76,11 @@ namespace icfp2015 {
                     sim.step(Actions::MoveE);
                 } else if (sim.step(Actions::MoveW, true) == VerifyState::Pass) {
                     sim.step(Actions::MoveW);
-                } else /* if (sim.step(Actions::MoveSE, true) == VerifyState::Pass) {
+                } else if (allowDrop && sim.step(Actions::MoveSE, true) == VerifyState::Pass) {
                     sim.step(Actions::MoveSE);
-                } else if (sim.step(Actions::MoveSW, true) == VerifyState::Pass) {
+                } else if (allowDrop && sim.step(Actions::MoveSW, true) == VerifyState::Pass) {
                     sim.step(Actions::MoveSW);
-                } else */ {
+                } else {
                     break;
                 }
 
@@ -112,8 +112,136 @@ namespace icfp2015 {
                 sim.print("After drop");
         }
 
-        void Try_Settle_more(Simulate &sim, int printField, Actions side = Actions::MoveE) {
+        Actions Try_Lock(Simulate &sim) {
+            if (sim.step(Actions::MoveE, true) == VerifyState::Lock) {
+                return Actions::MoveE;
+            } else if (sim.step(Actions::MoveW, true) == VerifyState::Lock) {
+                return Actions::MoveW;
+            } else if (sim.step(Actions::MoveSE, true) == VerifyState::Lock) {
+                return Actions::MoveSE;
+            } else if (sim.step(Actions::MoveSW, true) == VerifyState::Lock) {
+                return Actions::MoveSW;
+            } else if (sim.step(Actions::TurnCCW, true) == VerifyState::Lock) {
+                return Actions::TurnCCW;
+            } else if (sim.step(Actions::TurnCW, true) == VerifyState::Lock) {
+                return Actions::TurnCW;
+            } else {
+                return Actions::NoAction;
+            }
+        }
 
+        void Try_Settle_more(Simulate &sim, int printField) {
+            int turns = 0;
+            vector<Actions> bestSol;
+            vector<long> penalties;
+            long leastPenalty = (Try_Lock(sim) == Actions::NoAction) ? INT64_MAX : sim.penalty();
+            int round = 0;
+
+            Actions dir = (sim.step(Actions::TurnCW, true) == VerifyState::Pass) ? Actions::TurnCW : Actions::TurnCCW;
+
+            while (true) {
+                Simulate newsim(sim);
+                vector<Actions> newList;
+                vector<Actions> canLockWith;
+                vector<long> penalty;
+
+                if (sim.penalty() != newsim.penalty()) {
+                    glbLog() << "Worrysome!" << endl;
+                }
+
+                bool failed = false;
+                for (int i = 0; !failed && i < turns; ++i) {
+                    failed = newsim.step(dir) != VerifyState::Pass;
+                    newList.push_back(dir);
+                    penalty.push_back(newsim.penalty());
+                    canLockWith.push_back(Try_Lock(newsim));
+                }
+                if (failed) // no more turns possible;
+                    break;
+
+                if (printField >= PRINT_DEBUG)
+                    glbLog() << "trying " << turns << " turns round " << round << ": ";
+
+                Actions tryOrder[4];
+
+                if (round == 0) {
+                    tryOrder[0] = Actions::MoveE;
+                    tryOrder[1] = Actions::MoveSE;
+                    tryOrder[2] = Actions::MoveSW;
+                    tryOrder[3] = Actions::MoveW;
+                } else if (round == 1) {
+                    tryOrder[0] = Actions::MoveW;
+                    tryOrder[1] = Actions::MoveSW;
+                    tryOrder[2] = Actions::MoveSE;
+                    tryOrder[3] = Actions::MoveE;
+                } else if (round == 2) {
+                    tryOrder[0] = Actions::MoveSW;
+                    tryOrder[1] = Actions::MoveSE;
+                    tryOrder[2] = Actions::MoveE;
+                    tryOrder[3] = Actions::MoveW;
+                }
+
+                bool anyStep = true;
+                while (anyStep) {
+                    anyStep = false;
+                    for (int i = 0; i < 4; ++i) {
+                        if ((newsim.step(tryOrder[i], true)) == VerifyState::Pass) {
+                            newsim.step(tryOrder[i]);
+                            newList.push_back(tryOrder[i]);
+                            penalty.push_back(newsim.penalty());
+                            canLockWith.push_back(Try_Lock(newsim));
+                            anyStep = true;
+                            if (printField >= PRINT_DEBUG)
+                                glbLog() << ToString(tryOrder[i]);
+                            break;
+                        }
+                    }
+                }
+
+                if (penalty.size() != 0) {
+
+                    while (true) {
+                        auto score = min_element(penalty.begin(), penalty.end());
+                        if (*score >= leastPenalty) {
+                            if (printField >= PRINT_DEBUG)
+                                glbLog() << " rejecting with best penalty " << *score;
+                            break;
+                        }
+                        long index = distance(penalty.begin(), score);
+                        if (canLockWith[index] == Actions::NoAction) {
+                            *score = INT64_MAX;
+                            if (printField >= PRINT_DEBUG)
+                                glbLog() << " can not lock at penalty " << *score;
+                            continue;
+                        }
+                        if (printField >= PRINT_DEBUG)
+                            glbLog() << " using " << (index + 1) << " steps, penalty " << *score;
+                        leastPenalty = *score;
+                        bestSol = vector<Actions>(newList.begin(), newList.begin() + index + 1);
+                        penalties = vector<long>(penalty.begin(), penalty.begin() + index + 1);
+                        break;
+                    }
+                }
+
+                if (++round == 3) {
+                    ++turns;
+                    round = 0;
+                }
+                if (printField >= PRINT_DEBUG)
+                    glbLog() << endl;
+            }
+            for (Actions a:bestSol) {
+                sim.step(a);
+                if (printField >= PRINT_ALL)
+                    sim.print();
+            }
+
+            if (bestSol.size() != 0 && sim.penalty() != leastPenalty) {
+                glbLog() << "\n\n WTF again? \n\n" << endl;
+            }
+
+            if (printField >= PRINT_STEP)
+                sim.print("After Settle more");
         }
 
         void Try_Settle(Simulate &sim, int printField, Actions side = Actions::MoveE) {
@@ -148,7 +276,7 @@ namespace icfp2015 {
         Solver(const icfp2015::RNG &rng, Field &f, const Units &u, const vector<WordInfo> &w) : field(f), units(u),
                                                                                                 gen(rng), words(w) { }
 
-        long Run(int printField, int maxUnits) {
+        long Run(int printField, int maxUnits, int strategy = 2) {
             field.reset();
 
             Simulate sim(field, units, gen, maxUnits);
@@ -160,29 +288,36 @@ namespace icfp2015 {
                 if (printField >= PRINT_START)
                     sim.print("At start");
 
-                Try_Shift_Words(sim, printField);
+                if (strategy == 0) {
+
+                    Try_Words(sim, printField);
+
+                    Actions side = (sim.step(Actions::MoveE, true) == VerifyState::Pass) ? Actions::MoveE
+                                                                                         : Actions::MoveW;
+
+                    Try_Shift(sim, side, printField);
+
+                    Try_Drop(sim, printField, side);
+
+                } else if (strategy == 1) {
+                    Try_Shift_Words(sim, printField);
+                } else if (strategy == 2) {
+                    Try_Shift_Words(sim, printField, true);
+                }
 
                 Actions side = (sim.step(Actions::MoveE, true) == VerifyState::Pass) ? Actions::MoveE : Actions::MoveW;
 
-                //Try_Shift(sim, side, printField);
-
-                //Try_Words(sim, printField);
-
-                //Try_Drop(sim, printField, side);
-
-                // invert move
-                side = (side == Actions::MoveE) ? Actions::MoveW : Actions::MoveE;
-
-                Try_Settle(sim, printField, side);
+                //Try_Settle(sim, printField, side);
+                Try_Settle_more(sim, printField);
 
                 // lock
-                VerifyState mse, msw, ms, mas;
-                if ((msw = sim.step(Actions::MoveSW)) != VerifyState::Lock &&
-                    (mse = sim.step(Actions::MoveSE)) != VerifyState::Lock &&
-                    (ms = sim.step(side)) != VerifyState::Lock &&
-                    (mas = sim.step((side == Actions::MoveE) ? Actions::MoveW : Actions::MoveE)) != VerifyState::Lock) {
+                Actions lock = Try_Lock(sim);
+
+                if (lock == Actions::NoAction) {
                     glbLog() << "\n\nHOLY CRAP!\n\n" << endl;
                 }
+
+                sim.step(lock);
 
                 if (printField >= PRINT_START) {
                     sim.print("At end");

@@ -43,30 +43,13 @@ namespace icfp2015 {
 
         const void print(const string &note) const { field.print(note); }
 
+        const long penalty() const { return field.penalty(); }
+
         const void print() const {
             char buf[120];
             snprintf(buf, 120, "@(%i, %i %% %i) after", uX, uY, curUnit.Orient());
             string rslt(buf);
-            switch (last.code.back()) {
-                case Actions::MoveW:
-                    rslt += " W";
-                    break;
-                case Actions::MoveE:
-                    rslt += " E";
-                    break;
-                case Actions::MoveSW:
-                    rslt += " SW";
-                    break;
-                case Actions::MoveSE:
-                    rslt += " SE";
-                    break;
-                case Actions::TurnCW:
-                    rslt += " CW";
-                    break;
-                case Actions::TurnCCW:
-                    rslt += " CCW";
-                    break;
-            }
+            rslt += ToString(last.code.back());
             field.print(rslt, true);
         }
 

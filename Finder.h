@@ -61,26 +61,7 @@ namespace icfp2015 {
             for (const WordInfo &wi: words) {
                 glbLog() << "Word: '" << wi.wordOfPower << "', preprocessed: '" << wi.prepared << "', Moves: [";
                 for (Actions a:wi.actions) {
-                    switch (a) {
-                        case Actions::MoveW:
-                            glbLog() << "W ";
-                            break;
-                        case Actions::MoveE:
-                            glbLog() << "E ";
-                            break;
-                        case Actions::MoveSW:
-                            glbLog() << "SW ";
-                            break;
-                        case Actions::MoveSE:
-                            glbLog() << "SE ";
-                            break;
-                        case Actions::TurnCW:
-                            glbLog() << "CW ";
-                            break;
-                        case Actions::TurnCCW:
-                            glbLog() << "CC ";
-                            break;
-                    }
+                    glbLog() << ToString(a);
                 }
                 glbLog() << "]" << endl;
             }
@@ -127,7 +108,7 @@ namespace icfp2015 {
             Json::Value sub(Json::objectValue);
             sub["problemId"] = Json::Value::Int(id);
             sub["seed"] = Json::Value::Int(seed);
-            sub["tag"] = string("B@OBab v1.5") + ((words.size() == 0) ? "f" : "w");
+            sub["tag"] = string("B@OBab v1.6") + ((words.size() == 0) ? "f" : "w");
             sub["solution"] = sLine;
             root.append(sub);
             return bonus;

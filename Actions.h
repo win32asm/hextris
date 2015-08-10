@@ -17,12 +17,32 @@ namespace icfp2015 {
         PRINT_FIELD = 1,
         PRINT_START,
         PRINT_STEP,
-        PRINT_ALL
+        PRINT_ALL,
+        PRINT_DEBUG
     };
 
     enum class Actions {
-        MoveE, MoveW, MoveSE, MoveSW, TurnCW, TurnCCW
+        MoveE, MoveW, MoveSE, MoveSW, TurnCW, TurnCCW, NoAction
     };
+
+    static const char *ToString(Actions a) {
+        switch (a) {
+            case Actions::MoveW:
+                return " W";
+            case Actions::MoveE:
+                return " E";
+            case Actions::MoveSW:
+                return " SW";
+            case Actions::MoveSE:
+                return " SE";
+            case Actions::TurnCW:
+                return " CW";
+            case Actions::TurnCCW:
+                return " CCW";
+            default:
+                return " NO";
+        }
+    }
 
     class WordInfo {
     public:
@@ -34,11 +54,9 @@ namespace icfp2015 {
     class Solution {
     public:
         std::vector<Actions> code;
-        std::vector<long> scores;
 
         void reset() {
             code.clear();
-            scores.clear();
         }
     };
 
