@@ -69,6 +69,21 @@ namespace icfp2015 {
                 sim.print("After shift");
         }
 
+        void Try_Shift_Words(Simulate &sim, int printField) {
+
+            Actions side = (sim.step(Actions::MoveE, true) == VerifyState::Pass) ? Actions::MoveE : Actions::MoveW;
+
+            while (sim.step(side, true) == VerifyState::Pass) {
+                sim.step(side);
+                if (printField >= PRINT_ALL)
+                    sim.print();
+                Try_Words(sim, printField);
+            }
+
+            if (printField >= PRINT_STEP)
+                sim.print("After shift");
+        }
+
         void Try_Drop(Simulate &sim, int printField, Actions side = Actions::MoveE, int height = -1) {
 
             Actions down[3] = {Actions::MoveSE, Actions::MoveSW, Actions::MoveSE}; // hack
@@ -87,6 +102,10 @@ namespace icfp2015 {
 
             if (printField >= PRINT_STEP)
                 sim.print("After drop");
+        }
+
+        void Try_Settle_more(Simulate &sim, int printField, Actions side = Actions::MoveE) {
+
         }
 
         void Try_Settle(Simulate &sim, int printField, Actions side = Actions::MoveE) {
@@ -133,13 +152,13 @@ namespace icfp2015 {
                 if (printField >= PRINT_START)
                     sim.print("At start");
 
-                Try_Words(sim, printField);
+                Try_Shift_Words(sim, printField);
 
                 Actions side = (sim.step(Actions::MoveE, true) == VerifyState::Pass) ? Actions::MoveE : Actions::MoveW;
 
-                Try_Shift(sim, side, printField);
+                //Try_Shift(sim, side, printField);
 
-                Try_Words(sim, printField);
+                //Try_Words(sim, printField);
 
                 Try_Drop(sim, printField, side);
 

@@ -34,8 +34,12 @@ namespace icfp2015 {
     class Solution {
     public:
         std::vector<Actions> code;
+        std::vector<long> scores;
 
-        void reset() { code.clear(); }
+        void reset() {
+            code.clear();
+            scores.clear();
+        }
     };
 
 }
